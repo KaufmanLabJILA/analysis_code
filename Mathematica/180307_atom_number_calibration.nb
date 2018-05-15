@@ -1,0 +1,154 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.1' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      5071,        146]
+NotebookOptionsPosition[      4499,        124]
+NotebookOutlinePosition[      4844,        139]
+CellTagsIndexPosition[      4801,        136]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Calibrating atom number from PD", "Chapter",
+ CellChangeTimes->{{3.729429398918641*^9, 
+  3.729429408453961*^9}},ExpressionUUID->"3ebb5354-520f-419f-96d2-\
+471f061d36c4"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"\[Gamma]", " ", "=", " ", 
+   RowBox[{"2", "\[Pi]", "*", "32", "*", 
+    SuperscriptBox["10", "6"]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"s", " ", "=", " ", 
+   RowBox[{"6", "*", 
+    RowBox[{"8.6", "/", "42"}]}]}], ";", " ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"6", " ", "beams", " ", "Isat"}], " ", "=", " ", 
+     RowBox[{"42", 
+      RowBox[{"mW", "/", 
+       SuperscriptBox["cm", "2"]}]}]}], ",", " ", 
+    RowBox[{"beams", " ", "roughly", " ", "1", 
+     SuperscriptBox["cm", "2"]}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"\[HBar]", " ", "=", " ", 
+   RowBox[{"1.06", "*", 
+    SuperscriptBox["10", 
+     RowBox[{"-", "34"}]]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"\[Omega]", " ", "=", " ", 
+   RowBox[{"2", "\[Pi]", " ", "*", " ", "650", "*", 
+    SuperscriptBox["10", "12"]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"photonsperW", " ", "=", " ", 
+   RowBox[{"1", "/", 
+    RowBox[{"(", 
+     RowBox[{"\[HBar]", " ", "\[Omega]"}], ")"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"collection", " ", "=", " ", 
+   FractionBox[
+    RowBox[{"\[Pi]", "*", 
+     SuperscriptBox["1", "2"]}], 
+    RowBox[{"4", "\[Pi]", " ", 
+     SuperscriptBox["10", "2"]}]]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"wattsperatom", " ", "=", " ", 
+   RowBox[{
+    FractionBox[
+     RowBox[{"\[Gamma]", " ", "s"}], 
+     RowBox[{"4", 
+      RowBox[{"(", 
+       RowBox[{"1", "+", "s"}], ")"}]}]], "*", 
+    FractionBox["1", "photonsperW"], "*", "collection"}]}], ";", " ", 
+  RowBox[{"(*", 
+   RowBox[{
+   "4", " ", "in", " ", "denominator", " ", "accounts", " ", "for", " ", 
+    "detuning"}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"voltsperA", " ", "=", "  ", 
+   RowBox[{"1.5", "*", 
+    SuperscriptBox["10", "6"]}]}], ";", " ", 
+  RowBox[{"(*", 
+   RowBox[{"from", " ", "PDA36A", " ", "spec", " ", "sheet"}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"AperW", " ", "=", " ", ".12"}], ";", 
+  RowBox[{"(*", 
+   RowBox[{"from", " ", "PDA36A", " ", "spec", " ", "sheet"}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"wattsperV", " ", "=", " ", 
+   FractionBox["1", 
+    RowBox[{"voltsperA", "*", "AperW"}]]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"voltsperatom", " ", "=", " ", 
+   RowBox[{"wattsperatom", "/", "wattsperV"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"vmeas", " ", "=", " ", ".28"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"atoms", " ", "=", " ", 
+  RowBox[{"vmeas", "/", "voltsperatom"}]}]}], "Input",
+ CellChangeTimes->{{3.72942937239046*^9, 3.72942947025423*^9}, {
+  3.7294295359899025`*^9, 3.7294297016713037`*^9}, {3.72942978724673*^9, 
+  3.7294298315099325`*^9}, {3.7294299973742476`*^9, 3.729430153501501*^9}, {
+  3.7294305577579412`*^9, 3.7294305654694004`*^9}, {3.729430596006785*^9, 
+  3.729430620741734*^9}, {3.72943071737434*^9, 3.729430745878419*^9}, {
+  3.72943099053846*^9, 3.72943100936565*^9}, {3.729431255839917*^9, 
+  3.7294312605836425`*^9}, {3.7294314482047453`*^9, 3.7294314786295176`*^9}, {
+  3.729435994707356*^9, 
+  3.7294360091519933`*^9}},ExpressionUUID->"9160eac4-327d-40b8-834c-\
+37a390c7c623"],
+
+Cell[BoxData["5.1868384196019046`*^7"], "Output",
+ CellChangeTimes->{
+  3.729429819173897*^9, 3.7294300601833467`*^9, {3.7294301001498485`*^9, 
+   3.72943012386101*^9}, 3.7294301540854087`*^9, 3.7294305964931607`*^9, 
+   3.729430746145132*^9, {3.729431004136092*^9, 3.729431009742608*^9}, {
+   3.729431256699519*^9, 3.7294312609515147`*^9}, 3.7294314791832256`*^9, {
+   3.7294359972103467`*^9, 
+   3.7294360098444567`*^9}},ExpressionUUID->"0e1a4ffc-a1ad-4cf3-b16a-\
+ab1704453fdc"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{808, 706},
+WindowMargins->{{265, Automatic}, {Automatic, 213}},
+FrontEndVersion->"11.1 for Microsoft Windows (64-bit) (March 13, 2017)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 176, 3, 72, "Chapter", "ExpressionUUID" -> \
+"3ebb5354-520f-419f-96d2-471f061d36c4"],
+Cell[CellGroupData[{
+Cell[781, 29, 3207, 81, 353, "Input", "ExpressionUUID" -> \
+"9160eac4-327d-40b8-834c-37a390c7c623"],
+Cell[3991, 112, 480, 8, 30, "Output", "ExpressionUUID" -> \
+"0e1a4ffc-a1ad-4cf3-b16a-ab1704453fdc"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
