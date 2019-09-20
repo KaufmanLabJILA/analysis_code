@@ -1,24 +1,12 @@
-import imageio
-import scipy.stats
-import scipy.special
+from .imports import *
 
-import numpy as np
-import pandas as pd
-from numpy import array as arr
-
-import os
-import re
-import math
-
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from astropy.io import fits
-
-from scipy.stats import sem 
-from scipy import ndimage as ndi
-from scipy.optimize import curve_fit
-
-from PIL import Image
+# from .expfile import *
+# from .analysis import *
+# from .mathutil import *
+# from .plotutil import *
+# from .imagutil import *
+# from .mako import *
+# from .adam import *
 
 def loadBMPs(path, nameFormat):
     names = arr(os.listdir(path))

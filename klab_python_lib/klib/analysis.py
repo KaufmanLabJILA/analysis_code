@@ -1,32 +1,267 @@
-import imageio
-import scipy.stats
-import scipy.special
+from .imports import *
 
-import numpy as np
-import pandas as pd
-from numpy import array as arr
-
-import os
-import re
-import math
-
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from astropy.io import fits
-
-from scipy.stats import sem 
-from scipy import ndimage as ndi
-from scipy.optimize import curve_fit
-
-#####
-# Dependencies for HDF file wrapper class, ExpClass
-import h5py as h5
-from colorama import Fore, Style
-#####
-
-from .plotutil import *
+from .expfile import *
+# from .analysis import *
 from .mathutil import *
+# from .plotutil import *
 from .imagutil import *
+# from .mako import *
+# from .adam import *
+
+### Main data object
+class parsedData:
+    """Wrapper for parsing HDF5 experiment file. Access original file with "raw" attribute, other attributes include keyName, keysort, fillfracs, points, rois, and roisums."""
+    def __init__(self, dataAddress, fnum, roiSettings = [2, 5, 30], bgoff = (-20,30), bg_rowsub = True,
+                 bglevel=10614, countsperphoton = 70, thresh = 20, plots = True, mode = 'box', masks = 0, pad = 0, w = 0, iters = 0):
+        """Load in data file fnum from folder dataAddress. If setting ROI automatically, roi settings order: roi_size, filter_size, threshold. Otherwise provide full list of rois in roiSettings. Returns keySort, array of atom counts with dimensions [variation number, image number in experiment]"""
+        
+        exp = ExpFile(dataAddress+'Raw Data\\', fnum)        
+        keyName, keyVals, nreps, images = exp.key_name, exp.key, exp.reps, exp.pics
+        variations = len(keyVals)
+    #     print(keyVals)
+
+        # Subtract mean of first 10 rows from all images, helps get rid of noise near CCD readout edge.
+        meanimg = np.mean(images, axis=0)
+        bgrow = np.mean(meanimg[0:10],axis=0)
+        if bg_rowsub:
+            meanimg = arr([i-bgrow for i in meanimg])
+            for i in range(images.shape[0]):
+                img = images[i]
+                bgrow = np.mean(img[0:10],axis=0)
+                img = arr([row-bgrow for row in img])
+                images[i]=img      
+            images=arr(images)
+            bglevel = 0
+
+        # Set ROI
+
+        if arr(roiSettings).shape==(3,):
+            rois, bgrois = find_rois(meanimg, *roiSettings, bgoff, display = plots)
+        elif arr(roiSettings).shape!=(3,):
+            rois = roiSettings
+            bgrois = [[roi[0]+bgoff[0],roi[1]+bgoff[0],roi[2]+bgoff[1],roi[3]+bgoff[1]] for roi in rois]
+            if plots and mode == 'box':
+                plotrois(meanimg, rois)
+        else:
+            Exception(TypeError)
+
+        if mode == 'decon' or mode == 'mask':
+            xmin = arr(rois)[:,0].min()
+            xmax = arr(rois)[:,1].max()
+            ymin = arr(rois)[:,2].min()
+            ymax = arr(rois)[:,3].max()
+            if plots:
+                masksum = np.sum(masks, axis=0)
+                masksum = np.pad(masksum, ((ymin-pad, 0), (xmin-pad, 0)), mode = 'constant', constant_values = 0)
+                plt.imshow(meanimg)
+                plt.contour(masksum, 1, colors = 'r', alpha = 0.5)
+                plt.show()
+
+        if mode == 'decon':
+            xmin = arr(rois)[:,0].min()
+            xmax = arr(rois)[:,1].max()
+            ymin = arr(rois)[:,2].min()
+            ymax = arr(rois)[:,3].max()
+            images_crop = images[:, ymin-pad:ymax+pad, xmin-pad:xmax+pad]
+            images_rl = list(map(lambda image: deconvolve(image, w, iters), images_crop))
+            roisums = np.array(list(map(lambda image: 
+                                        list(map(lambda mask:
+                                                 np.sum(mask*image)-bglevel,
+                                                 masks)),
+                                        images_rl)))
+        elif mode == 'box':
+        # represent the roi sums as a 3-dimensional array.  Axes are variations, trials, rois.  
+            roisums = np.array(list(map(lambda image: 
+                                        list(map(lambda roi:
+                                                 get_roi_sum(image, roi, bgoff, display=False)-bglevel,
+                                                 rois)),
+                                        images)))
+        elif mode == 'mask':
+            xmin = arr(rois)[:,0].min()
+            xmax = arr(rois)[:,1].max()
+            ymin = arr(rois)[:,2].min()
+            ymax = arr(rois)[:,3].max()
+            images_crop = images[:, ymin-pad:ymax+pad, xmin-pad:xmax+pad]
+            roisums = np.array(list(map(lambda image: 
+                                        list(map(lambda mask:
+                                                 np.sum(mask*image)-bglevel,
+                                                 masks)),
+                                        images_crop)))
+        else:
+            raise ValueError('Invalid ROI mode. Available modes are box, mask, and decon.')
+        
+        # Nice way of sorting in multiple dimensions. TODO: better handling for arbitrary keyVal shapes.
+        if len(keyVals.shape)==1:
+            sort = np.argsort(keyVals)
+        elif len(keyVals.shape)==2:
+            sort = np.lexsort((keyVals[:,0],keyVals[:,1]))
+        
+        keySort = keyVals[sort]
+        
+        npics = (images.shape[0]//nreps)//keyVals.shape[0]
+        images = images.reshape((variations, nreps, npics, images.shape[1], images.shape[2]))
+        if mode == 'decon' or mode == 'mask':
+            roisums = roisums.reshape(variations, nreps, npics, len(masks))
+            self.roisums_old = roisums.reshape(variations, nreps*npics, len(masks))
+        elif mode == 'box':
+            roisums = roisums.reshape(variations, nreps, npics, len(rois))
+            self.roisums_old = roisums.reshape(variations, nreps*npics, len(rois))
+        #     roisums = roisums.reshape(variations, images.shape[0]//variations, len(rois))
+
+        imsort = images[sort]
+        roisums = roisums[sort]
+
+        atom_thresh = thresh*countsperphoton
+    #   Binarize roisums and average over reps. Axes are variation, image number in sequence, rois
+        binarized = np.clip(roisums, atom_thresh, atom_thresh+1) - atom_thresh
+        fill_first = np.mean(binarized[:,:,0,:], axis = (1,2))
+        fill_last = np.mean(binarized[:,:,-1,:], axis = (1,2))
+        fill_rois = np.mean(binarized[:,:,0,:], axis = 1)
+        fillfracs = np.mean(binarized, axis = (1,2,3))
+    #     print(tuple(np.arange(1, binarized.ndim)))
+
+        points = len(rois)*nreps
+        z = 1.96 # corresponds to 95% CI
+
+        error_first = z*np.sqrt(fill_first*(1-fill_first)/points)
+        error_last = z*np.sqrt(fill_last*(1-fill_last)/points)
+        error = z*np.sqrt(fillfracs*(1-fillfracs)/points)
+    #     lowerfrac = z*np.sqrt(fillfracs*(1-fillfracs)/points)
+        self.error = error
+        self.error_first = error_first
+        self.error_last = error_last
+        
+        self.imsort = imsort
+        
+        roiimgs = []
+        for roi in rois:
+            rimg = meanimg[roi[2]:roi[3],roi[0]:roi[1]]
+            roiimgs.append(rimg)
+        self.roiimgs = arr(roiimgs)
+        
+        roi = rois[len(rois)//2]
+        self.roiimg = meanimg[roi[2]:roi[3],roi[0]:roi[1]]
+        
+        self.fillfracs = fillfracs
+        self.fill_first = fill_first
+        self.fill_last = fill_last
+        self.fill_rois = fill_rois
+        self.raw = exp
+        self.keyName = keyName
+        self.keySort = keySort
+        self.points = points
+        self.rois = rois
+        self.roisums = roisums
+        self.fnum = fnum
+        self.thresh = thresh
+        self.countsperphoton = countsperphoton
+        self.binarized = binarized
+        self.npics = npics
+        self.nreps = nreps
+        self.meanimg = meanimg
+        
+        self.masks = masks
+
+def hist(parsed_data, countsperphoton = "Default", thresh = "Default", rng = None):
+    """Wrapper for hist_stats, will default to thresholds and counts per photon used when creating parsedData object, but can also manually specify values."""
+    if countsperphoton == "Default":
+        countsperphoton = parsed_data.countsperphoton
+    if thresh == "Default":
+        thresh = parsed_data.thresh
+    print("Current File: " + str(parsed_data.fnum))
+    return hist_stats_roi(parsed_data.roisums, thresh = thresh, countsperphoton = countsperphoton, rng=rng)
+        
+def getLossData(parsed_data, indroi = False, plots = False, timeOrdered = False):
+    """Returns sorted keyvals, loss between pairs of images in experiment, and error in that measurement, in that order. If data from individual roi is wanted, specify which roi number with indroi input."""
+
+    if timeOrdered:
+        if parsed_data.roisums.shape[0]!=1:
+            raise ValueError('Cannot plot fill per cycle with variations.')
+        roisums = parsed_data.roisums[0].reshape(parsed_data.nreps, parsed_data.npics//2, 2, len(parsed_data.rois))
+        roisums = roisums.swapaxes(0,1)
+        ks = range(roisums.shape[0])
+    else:
+        roisums = parsed_data.roisums
+        ks = parsed_data.keySort
+    losses =[]
+    losserrs = []
+    infids = []
+    for var in range(roisums.shape[0]):
+        if not indroi:
+            infidelity, inf_err, lossfrac, loss_err = hist_stats(roisums, i=var, thresh = parsed_data.thresh, countsperphoton = parsed_data.countsperphoton, quiet = True, plots = plots)
+        else:
+            infidelity, inf_err, lossfrac, loss_err = hist_stats(roisums, i=var, thresh = parsed_data.thresh, countsperphoton = parsed_data.countsperphoton, roinum = indroi, quiet = True, plots = plots)
+        losses.append(lossfrac)
+        infids.append(infidelity)
+        losserrs.append(loss_err)
+
+    return ks, arr(losses), arr(losserrs)
+
+def indPhases(parsed_data, plot = True, f = 1):
+#         centers = []
+#         errors = []
+#         widths = []
+    amps = []
+    phases = []
+    offsets = []
+    for roinum in range(len(parsed_data.rois)):
+        losses =[]
+        losserrs = []
+        infids = []
+        for var in range(roisums.shape[0]):
+            infidelity, inf_err, lossfrac, loss_err = hist_stats(parsed_data.roisums,i=var, thresh = parsed_data.thresh, countsperphoton = parsed_data.countsperphoton, roinum = roinum, quiet = True, plots = False)
+            losses.append(lossfrac)
+            infids.append(infidelity)
+            losserrs.append(loss_err)
+#             maxcoord = ks[np.argmax(losses)]
+        losses = arr(losses)        
+        ks = arr(parsed_data.keySort)
+        losserrs = arr(losserrs)        
+        ks = ks[losses>0]
+        losserrs = losserrs[losses>0]
+        losses = losses[losses>0]
+#             try:
+#             popt, pcov = gausfit(ks, losses,y_offset=True, negative=False, guess = [79.68, 50, .04, 10])
+#            popt, pcov = gausfit(ks, losses,y_offset=True, negative=True)
+#             f = 0.9
+        popt, pcov = cosFitF(ks, losses, f)
+#                 popt, pcov = cosFit(ks, losses)
+
+#             except:
+#                 print('fit failed')
+# #                 popt = [0, 0, 0, 0]
+# #                 pcov = [popt, popt, popt, popt]
+#                 popt = [0, 0, 0]
+#                 pcov = [popt, popt, popt]
+        xs = np.linspace(np.min(ks), np.max(ks), 100)
+#             plt.plot(xs, gaussian(xs, *popt), 'r-')
+        plt.plot(xs, cos(xs, f, *popt), 'r-')
+        perr = np.sqrt(np.diag(pcov))
+
+        amps.append(popt[0])
+        phases.append(popt[1])
+        offsets.append(popt[2])
+
+#             centers.append(popt[0])
+#             errors.append(perr[0])
+#             widths.append(popt[2])
+#             amps.append(popt[1])
+        plt.errorbar(ks, (losses), yerr=losserrs)
+        plt.xlabel(parsed_data.keyName)
+        plt.ylabel('losses')
+        plt.axis([min(xs), max(xs), 0, 100])
+        plt.title(roinum)
+
+        if plot:
+            plt.show()
+        else:
+            plt.close()
+#         return centers, errors, widths, amps
+    return amps, phases, offsets
+
+
+
+###
 
 def get_threshold(evencounts, oddcounts, tmin = 2, tmax = 10, criteria = 'inf'):
     """Finds threshold that minimizes the infidelity between two images"""

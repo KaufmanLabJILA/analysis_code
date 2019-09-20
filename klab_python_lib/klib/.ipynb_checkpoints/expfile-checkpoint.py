@@ -1,28 +1,4 @@
-import imageio
-import scipy.stats
-import scipy.special
-
-import numpy as np
-import pandas as pd
-from numpy import array as arr
-
-import os
-import re
-import math
-
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from astropy.io import fits
-
-from scipy.stats import sem 
-from scipy import ndimage as ndi
-from scipy.optimize import curve_fit
-
-#####
-# Dependencies for HDF file wrapper class, ExpClass
-import h5py as h5
-from colorama import Fore, Style
-#####
+from imports import *
 
 # HDF File wrapper class
 class ExpFile:

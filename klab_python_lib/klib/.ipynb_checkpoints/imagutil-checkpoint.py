@@ -1,25 +1,16 @@
-import imageio
+from .imports import *
 
-import numpy as np
-import pandas as pd
-from numpy import array as arr
-
-import os
-import re
-import math
-
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from mpl_toolkits.mplot3d import Axes3D
-
-from skimage import restoration
-from skimage.feature import peak_local_max
-from skimage import img_as_float
+# from .expfile import *
+# from .analysis import *
+from .mathutil import *
+# from .plotutil import *
+# from .imagutil import *
+# from .mako import *
+# from .adam import *
 
 def psf(x, w):
 #     return 1/(np.pi*w/2)*np.exp(-2*(x**2)/w)
     return np.exp(-2*(x**2)/w)
-
 
 def deconvolve(img, w, iters):
     a = round(w)
@@ -40,7 +31,7 @@ def atomVal(img, mask, w = 6, iters = 20):
     return np.sum(mask*deconvolve(img, w, iters))
 
 def getMasks(mimg, fftN = 2000, N = 10, wmask = 3, supersample = None):
-
+    """Given an averaged atom image, returns list of masks, where each mask corresponds to the appropriate mask for a single atom."""
     fimg = np.fft.fft2(mimg, s = (fftN,fftN))
     fimg = np.fft.fftshift(fimg)
     fimgAbs = np.abs(fimg)
