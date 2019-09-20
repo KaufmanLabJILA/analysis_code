@@ -1,2 +1,2 @@
 cd ..
-jupyter notebook
+jupyter lab

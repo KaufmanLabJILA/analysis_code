@@ -1,4 +1,2 @@
-cd /Volumes/
-cd kaufman_heap/
-cd heap
+cd ..
 jupyter notebook

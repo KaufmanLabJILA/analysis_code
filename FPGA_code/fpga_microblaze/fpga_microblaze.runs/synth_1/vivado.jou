@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Wed Dec 26 19:38:39 2018
+# Process ID: 17040
+# Current directory: A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/synth_1
+# Command line: vivado.exe -log mb_test_wrapper.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source mb_test_wrapper.tcl
+# Log file: A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/synth_1/mb_test_wrapper.vds
+# Journal file: A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/synth_1\vivado.jou
+#-----------------------------------------------------------
+source mb_test_wrapper.tcl -notrace

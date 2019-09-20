@@ -1,0 +1,18 @@
+20:09:12 INFO  : Registering command handlers for SDK TCF services
+20:09:13 INFO  : Launching XSCT server: xsct.bat -interactive A:\heap\Analysis_code\FPGA code\temp_xsdb_launch_script.tcl
+20:09:14 ERROR : (XSDB Server)couldn't read file "A:\heap\Analysis_code\FPGA": permission denied
+
+20:10:41 INFO  : Registering command handlers for SDK TCF services
+20:10:42 INFO  : Launching XSCT server: xsct.bat -interactive A:\heap\Analysis_code\FPGA code\temp_xsdb_launch_script.tcl
+20:10:43 ERROR : (XSDB Server)couldn't read file "A:\heap\Analysis_code\FPGA": permission denied
+
+20:13:42 ERROR : Timed out. 180 seconds have elapsed while waiting for XSCT server to launch.
+20:13:42 INFO  : Launching XSCT server: xsct.bat -interactive A:\heap\Analysis_code\FPGA code\temp_xsdb_launch_script.tcl
+20:13:43 ERROR : (XSDB Server)couldn't read file "A:\heap\Analysis_code\FPGA": permission denied
+
+20:16:42 ERROR : Timed out. 180 seconds have elapsed while waiting for XSCT server to launch.
+20:16:42 ERROR : Failed to call init_repo
+Reason: xsct server communication channel is not established.
+20:16:42 ERROR : Exception raised in executing the command =Failed to call init_repo
+Reason: xsct server communication channel is not established. 
+20:16:42 ERROR : Workspace location A:\heap\Analysis_code\FPGA code contains spaces. Please switch to a workspace without spaces in its path.

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<Runs Version="1" Minor="0">
+	<Run Id="mb_test_clk_wiz_0_1_synth_1" LaunchDir="A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/mb_test_clk_wiz_0_1_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="mb_test_proc_sys_reset_0_0_synth_1" LaunchDir="A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/mb_test_proc_sys_reset_0_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="mb_test_ilmb_bram_if_cntlr_0_synth_1" LaunchDir="A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/mb_test_ilmb_bram_if_cntlr_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="mb_test_mdm_1_0_synth_1" LaunchDir="A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/mb_test_mdm_1_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="mb_test_axi_uartlite_0_0_synth_1" LaunchDir="A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/mb_test_axi_uartlite_0_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="mb_test_lmb_bram_0_synth_1" LaunchDir="A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/mb_test_lmb_bram_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="mb_test_dlmb_bram_if_cntlr_0_synth_1" LaunchDir="A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/mb_test_dlmb_bram_if_cntlr_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="mb_test_ilmb_v10_0_synth_1" LaunchDir="A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/mb_test_ilmb_v10_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="mb_test_microblaze_0_0_synth_1" LaunchDir="A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/mb_test_microblaze_0_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="mb_test_dlmb_v10_0_synth_1" LaunchDir="A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/mb_test_dlmb_v10_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado" IsOrderedIPRun="true">
+		<Parent Id="mb_test_ilmb_v10_0_synth_1"/>
+	</Run>
+	<Run Id="synth_1" LaunchDir="A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado">
+		<Parent Id="mb_test_clk_wiz_0_1_synth_1"/>
+		<Parent Id="mb_test_proc_sys_reset_0_0_synth_1"/>
+		<Parent Id="mb_test_ilmb_bram_if_cntlr_0_synth_1"/>
+		<Parent Id="mb_test_mdm_1_0_synth_1"/>
+		<Parent Id="mb_test_axi_uartlite_0_0_synth_1"/>
+		<Parent Id="mb_test_lmb_bram_0_synth_1"/>
+		<Parent Id="mb_test_dlmb_bram_if_cntlr_0_synth_1"/>
+		<Parent Id="mb_test_ilmb_v10_0_synth_1"/>
+		<Parent Id="mb_test_microblaze_0_0_synth_1"/>
+		<Parent Id="mb_test_dlmb_v10_0_synth_1"/>
+	</Run>
+	<Run Id="impl_1" LaunchDir="A:/heap/Analysis_code/FPGA code/fpga_microblaze/fpga_microblaze.runs/impl_1" FlowId="Vivado_Implementation" FromStepId="init_design" ToStepId="write_bitstream">
+		<Parent Id="synth_1"/>
+		<Parent Id="mb_test_clk_wiz_0_1_synth_1"/>
+		<Parent Id="mb_test_proc_sys_reset_0_0_synth_1"/>
+		<Parent Id="mb_test_ilmb_bram_if_cntlr_0_synth_1"/>
+		<Parent Id="mb_test_mdm_1_0_synth_1"/>
+		<Parent Id="mb_test_axi_uartlite_0_0_synth_1"/>
+		<Parent Id="mb_test_lmb_bram_0_synth_1"/>
+		<Parent Id="mb_test_dlmb_bram_if_cntlr_0_synth_1"/>
+		<Parent Id="mb_test_ilmb_v10_0_synth_1"/>
+		<Parent Id="mb_test_microblaze_0_0_synth_1"/>
+		<Parent Id="mb_test_dlmb_v10_0_synth_1"/>
+	</Run>
+	<Parameters>
+		<Parameter Name="runs.monitorLSFJobs" Val="true" Type="bool"/>
+	</Parameters>
+</Runs>
+
